@@ -12,7 +12,7 @@
           <a class ="nav-item nav-link" href="/login">Log In</a> 
           <a class ="nav-item nav-link" href="/register">Register</a> 
         <% } else { %>
-        <a>Logged in as: <%= user.email %></a><form method = "post" action = "/logout"><button type = "logout" >Log Out</button></form>
+        <a>Logged in as: <%= user %></a><form method = "post" action = "/logout"><button type = "logout" >Log Out</button></form>
         <% } %>
       </div>
     </div>
