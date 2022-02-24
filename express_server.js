@@ -4,6 +4,9 @@ const cookieParser = require('cookie-parser');
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
 const app = express();
+const { getPassword } = require('./helpers');
+const { checkEmail } = require(' ./helpers');
+const { generateRandomString } = require('./helpers');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 app.use(cookieSession({
@@ -27,11 +30,13 @@ const urlDatabase = {
     }, 
 };
 
+//Main Page
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase, user: req.session.user_id};
   res.render("urls_index", templateVars);
 });
 
+//Register Page
 app.get("/register", (req, res) => {
   const templateVars = {user: req.session.user_id};
   res.render("urls_register", templateVars);
@@ -42,7 +47,7 @@ app.post("/register", (req, res) => {
     res.status(400).send("please enter a valid email");
   } else if (!req.body["password"]){
     res.status(400).send("please enter a password");
-  } else if (checkEmail(req.body["email"])) {
+  } else if (checkEmail(req.body["email"],users)) {
     res.status(400).send("email already registered");
   } else {
     const newID = generateRandomString();
@@ -57,6 +62,7 @@ app.post("/register", (req, res) => {
   console.log(users);
 });
 
+//Login page
 app.get("/login", (req, res) => {
   templateVars = {user: req.session.user_id};
   res.render("urls_login", templateVars);
@@ -65,15 +71,17 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const loginEmail = req.body["email"];
   const loginPassword = req.body["password"];
-  if(!checkEmail(loginEmail)) {
+  if(!checkEmail(loginEmail),users) {
     res.status(403).send("No account with that email found");
-  } else if (!passwordCheck(loginEmail,loginPassword)) {
+  } else if (bycrpt.compareSync(loginPassword,getPassword(loginEmail,users))) {
     res.status(403).send("Invalid Password");
   } else {
     req.session.user_id = loginEmail;
     res.redirect('/urls');
   }
 });
+
+//New short URL Page
 app.get("/urls/new", (req, res) => {
   if(!req.session.user_id) {
     res.redirect("/login");
@@ -92,11 +100,13 @@ app.post("/urls/new", (req, res) => {
   res.redirect("/urls/"+shortUrl);
 });
 
+//Logout
 app.post("/logout", (req,res) => {
   req.session = null;
   res.redirect("/urls");
 })
 
+//Delete
 app.post("/urls/:shortURL/delete", (req, res) => {
   if(!req.session.user_id) {
   res.redirect("/login");
@@ -105,18 +115,14 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect("/urls");
 })
 
-app.get("/urls/:shortURL", (req,res) => {if(!req.session.user_id) {
+//edit a short url
+app.get("/urls/:shortURL", (req,res) => {
+  if(!req.session.user_id) {
   res.redirect("/login");
 }
   const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]["longURL"], user: req.session.user_id};
   res.render("urls_show", templateVars);
 });
-
-app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL]["longURL"];
-  res.redirect(longURL);
-})
-
 
 
 app.post("/urls/:shortURL/edit", (req,res) => {
@@ -124,6 +130,13 @@ app.post("/urls/:shortURL/edit", (req,res) => {
   res.redirect("/urls");
 })
 
+//Using the short url link
+app.get("/u/:shortURL", (req, res) => {
+  const longURL = urlDatabase[req.params.shortURL]["longURL"];
+  res.redirect(longURL);
+})
+
+//home page
 app.get("/", (req, res) => {
   if(!req.session.user_id) {
     res.redirect("/login");
@@ -140,32 +153,3 @@ app.listen(PORT, () => {
 
 
 
-//FUNCTIONS
-const generateRandomString = function() {
-   const charList = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-   let output = '';
-   const shortUrlLength = 6;
-   for(let i = 0; i < shortUrlLength; i++) {
-     const randomNumber = Math.floor(Math.random() * charList.length);
-     output += charList.charAt(randomNumber);
-   }
-   return output;
- };
-
- const checkEmail = function (newEmail) {
-  for(const user in users) {
-    if(newEmail === users[user].email) {
-      return true;
-    }
-  }
-  return false;
- };
-
- const passwordCheck = function(email,password) {
-   for(const user in users) {
-     if(users[user]["email"] === email && bcrypt.compareSync(password,users[user]["password"])) {
-       return true;
-     }
-   }
-   return false;
- };
