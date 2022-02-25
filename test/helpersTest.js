@@ -31,21 +31,27 @@ describe('#checkEmail', function() {
 
 describe('#generateRandomString', function() {
 
-  it('should return a 6 character string', function () {
+  it('should return a 6 character string', function() {
     const result = generateRandomString();
     assert.equal(result.length,6);
   });
+
+  it('should return unique strings each time', function() {
+    const result1 = generateRandomString();
+    const result2 = generateRandomString();
+    assert.notEqual(result1,result2);
+  });
 });
 
-describe('#getPassword', function () {
+describe('#getPassword', function() {
 
-  it('should return the encrypted password of the email specified', function () {
+  it('should return the encrypted password of the email specified', function() {
     const result = getPassword("user2@gmail.com",testUsers);
     assert.equal(result,"12345");
   });
 
-  it('should return false if no email in the user database matches the one specified', function () {
+  it('should return false if no email in the user database matches the one specified', function() {
     const result = getPassword('gungaginga@gmail.com',testUsers);
     assert.equal(result,false);
-  })
-})
+  });
+});
