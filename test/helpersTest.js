@@ -1,7 +1,5 @@
 const { assert } = require('chai');
-const { checkEmail } = require('../helpers');
-const { generateRandomString } = require("../helpers");
-const { getPassword } = require("../helpers");
+const { checkEmail, generateRandomString, getPassword } = require('../helpers');
 
 const testUsers = {
   "userID1": {
@@ -15,6 +13,7 @@ const testUsers = {
     password: "12345",
   }
 };
+
 
 describe('#checkEmail', function() {
 

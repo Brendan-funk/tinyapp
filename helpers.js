@@ -27,4 +27,6 @@ const getPassword = function(email,users) {
   }
   return false;
 };
-module.exports = {generateRandomString, checkEmail, getPassword};
+
+
+module.exports = {generateRandomString, checkEmail, getPassword,};
