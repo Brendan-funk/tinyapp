@@ -104,7 +104,7 @@ app.get("/urls/:shortURL", (req,res) => {
   if (!req.session.userId) {
     res.redirect("/login");
   }
-  if(req.session.userId !== urlDatabase[req.params]){
+  if(req.session.userId !== urlDatabase[req.params.shortURL]["user"]){
     res.status(401).send("Not your URL")
   }
   const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]["longURL"], user: req.session.userId, urlUser: urlDatabase[req.params.shortURL]["user"]};
