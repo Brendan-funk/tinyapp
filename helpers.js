@@ -1,4 +1,6 @@
 //FUNCTIONS
+
+//generates random string of 6 alphanumeric characters
 const generateRandomString = function() {
   const charList = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let output = '';
@@ -10,6 +12,7 @@ const generateRandomString = function() {
   return output;
 };
 
+//checks if the email is already used in an account
 const checkEmail = function(newEmail,users) {
   for (const user in users) {
     if (newEmail === users[user].email) {
@@ -19,6 +22,7 @@ const checkEmail = function(newEmail,users) {
   return false;
 };
 
+//retrieves the users incrypted password based on email, in order to compare for log in
 const getPassword = function(email,users) {
   for (const user in users) {
     if (users[user]["email"] === email) {

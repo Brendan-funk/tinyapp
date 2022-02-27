@@ -14,16 +14,7 @@ const PORT = 8080; // default port 8080
 app.set("view engine", "ejs");
 
 const users = {};
-const urlDatabase = {
-  "b2xVn2": {
-    longURL:  "http://www.lighthouselabs.ca",
-    user: "default",
-  },
-  "9sm5xK": {
-    longURL: "http://www.google.com",
-    user: "default"
-  },
-};
+const urlDatabase = {};
 
 //Main Page
 app.get("/urls", (req, res) => {
@@ -113,6 +104,9 @@ app.get("/urls/:shortURL", (req,res) => {
   if (!req.session.userId) {
     res.redirect("/login");
   }
+  if(req.session.userId !== urlDatabase[req.params]){
+    res.status(401).send("Not your URL")
+  }
   const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]["longURL"], user: req.session.userId, urlUser: urlDatabase[req.params.shortURL]["user"]};
   res.render("urls_show", templateVars);
 });
@@ -138,7 +132,7 @@ app.get("/", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is live`);
+  console.log(`Server is live on port 8080`);
 });
 
 
